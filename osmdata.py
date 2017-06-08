@@ -40,6 +40,17 @@ class Attributes:
 		return t		
 	def remove(self,k):
 		del self._dict[k]
+	def equals(self,attr_2):
+		equals=True
+		for key in list(self._dict.keys()):
+			if not(attr_2.has(key)): equals=False
+			elif not(attr_2.has(key,self._dict[key])): equals=False
+			if not equals: break	
+		for key in list(attr_2._dict.keys()):
+			if not(self.has(key)): equals=False
+			elif not(self.has(key,attr_2._dict[key])): equals=False
+			if not equals: break
+		return equals
 
 class Point:
 	def __init__(self,x,y):
@@ -59,6 +70,9 @@ class Point:
 		self._y=y
 	def offset_meters(self,dxm,dym):
 		self._y,self._x=offset_meters(self.y,self.x,dym,dxm)
+	def equals(self,p_2):
+		if (self.x!=p_2.x) or (self.y!=p_2.y): return False
+		else: return True
 	
 class OsmObject:
 	def __init__(self,id,attr_list,action="",timestamp="",uid="",user="",visible="",version="",changeset=""):
@@ -107,7 +121,8 @@ class OsmWay(OsmObject):
 	def __init__(self,id,nodes,attr_list,action="",timestamp="",uid="",user="",visible="",version="",changeset=""):
 		super(OsmWay,self).__init__(id,attr_list,action,timestamp,uid,user,visible,version,changeset)
 		self._nodes=nodes
-		self._is_closed=(nodes[0]==nodes[-1])
+		try: self._is_closed=(nodes[0]==nodes[-1])
+		except: pass
 		self._nodes_count=len(self._nodes)
 	@property
 	def is_closed(self):
